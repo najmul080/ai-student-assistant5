@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Student Assistant</title>
+    <style>
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #eef2ff, #f8fafc);
+            color: #172033;
+        }
+        .container {
+            max-width: 850px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .card {
+            background: white;
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 12px 35px rgba(0,0,0,0.10);
+        }
+        h1 { margin-bottom: 8px; }
+        .subtitle { color: #64748b; margin-top: 0; }
+        .student {
+            background: #f1f5f9;
+            padding: 14px 18px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 16px;
+            resize: vertical;
+        }
+        button {
+            margin-top: 14px;
+            width: 100%;
+            padding: 14px;
+            border: 0;
+            border-radius: 12px;
+            background: #4f46e5;
+            color: white;
+            font-size: 17px;
+            cursor: pointer;
+        }
+        button:hover { background: #4338ca; }
+        button:disabled { opacity: 0.6; cursor: wait; }
+        .result {
+            margin-top: 24px;
+            background: #f8fafc;
+            border-left: 4px solid #4f46e5;
+            padding: 18px;
+            border-radius: 10px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+            min-height: 70px;
+        }
+        .small { color: #64748b; font-size: 13px; margin-top: 18px; }
+    </style>
+</head>
+<body>
+<div class="container">
+    <div class="card">
+        <h1>🤖 AI Student Assistant</h1>
+        <p class="subtitle">A simple Render-based cloud service using a Gemini AI API.</p>
+
+        <div class="student">
+            <strong>Student:</strong> {{ student_name }}<br>
+            <strong>Student ID:</strong> {{ student_id }}
+        </div>
+
+        <h2>Ask the AI</h2>
+        <textarea id="prompt" placeholder="Example: Explain cloud computing in simple words."></textarea>
+        <button id="askBtn" onclick="askAI()">Ask AI</button>
+
+        <div id="result" class="result">Your AI answer will appear here.</div>
+        <p class="small">Assignment: Simple Render-based cloud service with an AI feature.</p>
+    </div>
+</div>
+
+<script>
+async function askAI() {
+    const prompt = document.getElementById("prompt").value.trim();
+    const result = document.getElementById("result");
+    const button = document.getElementById("askBtn");
+
+    if (!prompt) {
+        result.textContent = "Please enter a question first.";
+        return;
+    }
+
+    button.disabled = true;
+    button.textContent = "Thinking...";
+    result.textContent = "AI is generating an answer...";
+
+    try {
+        const response = await fetch("/ask", {
+            method: "POST",
+            headers: {"Content-Type": "application/json"},
+            body: JSON.stringify({prompt: prompt})
+        });
+
+        const data = await response.json();
+        result.textContent = data.answer || "No answer returned.";
+    } catch (error) {
+        result.textContent = "Connection error. Please try again.";
+    } finally {
+        button.disabled = false;
+        button.textContent = "Ask AI";
+    }
+}
+</script>
+</body>
+</html>
